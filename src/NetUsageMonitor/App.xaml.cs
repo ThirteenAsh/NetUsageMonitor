@@ -7,6 +7,7 @@ using NetUsageMonitor.Configuration;
 using NetUsageMonitor.Engine;
 using NetUsageMonitor.Ui;
 using NetUsageMonitor.ViewModels;
+using ContextMenu = System.Windows.Controls.ContextMenu;
 using Drawing = System.Drawing;
 using WinForms = System.Windows.Forms;
 
@@ -59,6 +60,8 @@ public partial class App : Application
 
         // ---- Settings & records folder ----
         _settings = AppSettings.Load();
+        if (_settings.UseLightTheme)
+            ApplyTheme(useLightTheme: true);
         TryEnsureRecordsFolder();
         SyncAutoStart();
 
@@ -78,6 +81,23 @@ public partial class App : Application
         bool startMinimized = e.Args.Contains("--minimized") || _settings.StartMinimized;
         if (!startMinimized)
             ShowMainWindow();
+    }
+
+    internal void ApplyTheme(bool useLightTheme)
+    {
+        string palette = useLightTheme ? "Light" : "Dark";
+        Resources.MergedDictionaries[0] = new ResourceDictionary
+        {
+            Source = new Uri($"/NetUsageMonitor;component/Ui/Themes/{palette}.xaml", UriKind.Relative)
+        };
+    }
+
+    private void OnContextMenuOpened(object sender, RoutedEventArgs e)
+    {
+        var menu = (ContextMenu)sender;
+        menu.SetResourceReference(ContextMenu.BackgroundProperty, "PanelBg");
+        menu.SetResourceReference(ContextMenu.ForegroundProperty, "TextPrimary");
+        menu.SetResourceReference(ContextMenu.BorderBrushProperty, "BorderBrush");
     }
 
     private void StartShowSignalListener()

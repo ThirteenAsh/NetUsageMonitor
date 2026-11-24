@@ -4,7 +4,7 @@
         xmlns:ui="clr-namespace:NetUsageMonitor.Ui"
         Language="zh-CN" Title="网络流量监控" Height="680" Width="1080" MinHeight="480" MinWidth="860"
         WindowStartupLocation="CenterScreen"
-        Background="{StaticResource WindowBg}"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextPrimary}"
         Icon="Assets/app.ico">
 
     <Window.Resources>
@@ -16,7 +16,7 @@
             <Setter Property="HorizontalContentAlignment" Value="Right" />
         </Style>
         <Style x:Key="StatLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
             <Setter Property="FontSize" Value="12" />
         </Style>
         <Style x:Key="StatValue" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -27,7 +27,7 @@
         <Style x:Key="SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{StaticResource Accent}" />
+            <Setter Property="Foreground" Value="{DynamicResource Accent}" />
             <Setter Property="Margin" Value="0,16,0,6" />
         </Style>
         <Style x:Key="SmallButton" TargetType="Button" BasedOn="{StaticResource ToolButton}">
@@ -62,7 +62,7 @@
             <!-- Search -->
             <Grid Grid.Column="1" Margin="12,0,0,0">
                 <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Text="搜索应用…" Foreground="{StaticResource TextSecondary}"
+                <TextBlock Text="搜索应用…" Foreground="{DynamicResource TextSecondary}"
                            Margin="10,0" IsHitTestVisible="False" VerticalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -88,11 +88,11 @@
 
             <!-- Totals + actions -->
             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
-                <Border Background="{StaticResource PanelBg}" CornerRadius="6" Padding="10,5" Margin="0,0,8,0">
+                <Border Background="{DynamicResource PanelBg}" CornerRadius="6" Padding="10,5" Margin="0,0,8,0">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="↓" Foreground="{StaticResource AccentGreen}" FontWeight="Bold" />
+                        <TextBlock Text="↓" Foreground="{DynamicResource AccentGreen}" FontWeight="Bold" />
                         <TextBlock Text="{Binding TotalDownText}" Margin="4,0,8,0" FontFamily="Consolas" />
-                        <TextBlock Text="↑" Foreground="{StaticResource Accent}" FontWeight="Bold" />
+                        <TextBlock Text="↑" Foreground="{DynamicResource Accent}" FontWeight="Bold" />
                         <TextBlock Text="{Binding TotalUpText}" Margin="4,0,0,0" FontFamily="Consolas" />
                     </StackPanel>
                 </Border>
@@ -103,10 +103,10 @@
                         <Ellipse Width="9" Height="9" Margin="0,0,6,0">
                             <Ellipse.Style>
                                 <Style TargetType="Ellipse">
-                                    <Setter Property="Fill" Value="{StaticResource AccentGreen}" />
+                                    <Setter Property="Fill" Value="{DynamicResource AccentGreen}" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding IsRecording}" Value="False">
-                                            <Setter Property="Fill" Value="{StaticResource TextSecondary}" />
+                                            <Setter Property="Fill" Value="{DynamicResource TextSecondary}" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -131,7 +131,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Apps grid -->
-            <Border Grid.Column="0" Background="{StaticResource PanelBg2}" CornerRadius="8" Padding="2">
+            <Border Grid.Column="0" Background="{DynamicResource PanelBg2}" CornerRadius="8" Padding="2">
                 <DataGrid x:Name="AppsGrid"
                           ItemsSource="{Binding RowsView}"
                           SelectedItem="{Binding SelectedRow}"
@@ -216,9 +216,9 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <Ellipse Width="8" Height="8" Margin="0,0,6,0"
-                                                 Fill="{Binding Status, Converter={StaticResource StatusBrush}}" />
+                                                 Style="{StaticResource StatusDot}" />
                                         <TextBlock Text="{Binding StatusText}" FontSize="12"
-                                                   Foreground="{StaticResource TextSecondary}" />
+                                                   Foreground="{DynamicResource TextSecondary}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
@@ -231,11 +231,11 @@
                           Background="Transparent" />
 
             <!-- Detail panel -->
-            <Border Grid.Column="2" Background="{StaticResource PanelBg2}" CornerRadius="8" Padding="0">
+            <Border Grid.Column="2" Background="{DynamicResource PanelBg2}" CornerRadius="8" Padding="0">
                 <Grid>
                     <!-- Empty state -->
                     <TextBlock Text="选择一个应用即可查看流量详情、历史记录和管理选项。"
-                               Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" Margin="16"
+                               Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" Margin="16"
                                VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"
                                Visibility="{Binding SelectedRow, Converter={StaticResource NullVis}, ConverterParameter=invert}" />
 
@@ -248,16 +248,16 @@
                                 <TextBlock Text="{Binding SelectedRow.DisplayName}" FontSize="16" FontWeight="Bold"
                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
                             </StackPanel>
-                            <TextBlock Text="{Binding SelectedRow.ExePath}" Foreground="{StaticResource TextSecondary}"
+                            <TextBlock Text="{Binding SelectedRow.ExePath}" Foreground="{DynamicResource TextSecondary}"
                                        FontSize="11" TextWrapping="Wrap" Margin="0,0,0,6" />
 
                             <!-- Status badges -->
                             <StackPanel Orientation="Horizontal">
-                                <Border Background="#EF4444" CornerRadius="4" Padding="6,2" Margin="0,0,6,0"
+                                <Border Background="{DynamicResource BlockedBadgeBg}" CornerRadius="4" Padding="6,2" Margin="0,0,6,0"
                                         Visibility="{Binding SelectedRow.IsBlocked, Converter={StaticResource BoolVis}}">
                                     <TextBlock Text="已禁止联网" FontSize="10" FontWeight="Bold" Foreground="White" />
                                 </Border>
-                                <Border Background="#F97316" CornerRadius="4" Padding="6,2"
+                                <Border Background="{DynamicResource LimitBadgeBg}" CornerRadius="4" Padding="6,2"
                                         Visibility="{Binding SelectedRow.CapTripped, Converter={StaticResource BoolVis}}">
                                     <TextBlock Text="已达限额" FontSize="10" FontWeight="Bold" Foreground="White" />
                                 </Border>
@@ -291,9 +291,9 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Grid.Column="0" Text="实时下载" Style="{StaticResource StatLabel}" />
                                 <TextBlock Grid.Row="0" Grid.Column="1" Text="实时上传" Style="{StaticResource StatLabel}" />
-                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource StatValue}" Foreground="{StaticResource AccentGreen}"
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource StatValue}" Foreground="{DynamicResource AccentGreen}"
                                            Text="{Binding SelectedRow.DownRate, Converter={StaticResource Rate}}" />
-                                <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource StatValue}" Foreground="{StaticResource Accent}"
+                                <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource StatValue}" Foreground="{DynamicResource Accent}"
                                            Text="{Binding SelectedRow.UpRate, Converter={StaticResource Rate}}" />
                                 <TextBlock Grid.Row="2" Grid.Column="0" Text="时段平均下载" Style="{StaticResource StatLabel}" />
                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="时段平均上传" Style="{StaticResource StatLabel}" />
@@ -309,10 +309,10 @@
                             <TextBlock Text="保留时段流量" Style="{StaticResource SectionHeader}" />
                             <ui:UsageChart x:Name="Chart" Height="110" Margin="0,0,0,4" />
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <Ellipse Width="8" Height="8" Fill="{StaticResource AccentGreen}" Margin="0,0,5,0" />
-                                <TextBlock Text="下载" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,0,14,0" />
-                                <Ellipse Width="8" Height="8" Fill="{StaticResource Accent}" Margin="0,0,5,0" />
-                                <TextBlock Text="上传" FontSize="11" Foreground="{StaticResource TextSecondary}" />
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource AccentGreen}" Margin="0,0,5,0" />
+                                <TextBlock Text="下载" FontSize="11" Foreground="{DynamicResource TextSecondary}" Margin="0,0,14,0" />
+                                <Ellipse Width="8" Height="8" Fill="{DynamicResource Accent}" Margin="0,0,5,0" />
+                                <TextBlock Text="上传" FontSize="11" Foreground="{DynamicResource TextSecondary}" />
                             </StackPanel>
                             <Grid>
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
@@ -331,7 +331,7 @@
                             <TextBlock Text="流量限额（达限后禁止联网）" Style="{StaticResource SectionHeader}" />
                             <TextBlock Text="{Binding SelectedRow.CapText}" FontSize="13" FontWeight="SemiBold" />
                             <ProgressBar Height="6" Minimum="0" Maximum="100" Value="{Binding SelectedRow.CapPercent, Mode=OneWay}"
-                                         Margin="0,5" Foreground="{StaticResource Accent}" Background="{StaticResource PanelBg}"
+                                         Margin="0,5" Foreground="{DynamicResource Accent}" Background="{DynamicResource PanelBg}"
                                          BorderThickness="0"
                                          Visibility="{Binding SelectedRow.HasCap, Converter={StaticResource BoolVis}}" />
                             <WrapPanel>
@@ -352,7 +352,7 @@
                                         Visibility="{Binding SelectedRow.IsRecordingConnections, Converter={StaticResource BoolVis}}" />
                             </WrapPanel>
                             <TextBlock Text="启用后记录此应用连接的域名和 IP 地址。域名可能无法解析，且不会记录 HTTPS 完整网址。"
-                                       FontSize="11" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,6"
+                                       FontSize="11" Foreground="{DynamicResource TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,6"
                                        Visibility="{Binding SelectedRow.IsRecordingConnections, Converter={StaticResource BoolVis}, ConverterParameter=invert}" />
                             <ItemsControl x:Name="ConnectionsList" MaxHeight="220"
                                           Visibility="{Binding SelectedRow.IsRecordingConnections, Converter={StaticResource BoolVis}}">
@@ -363,10 +363,10 @@
                                 </ItemsControl.Template>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Background="#15202E" CornerRadius="4" Padding="8,5" Margin="0,0,0,4">
+                                        <Border Background="{DynamicResource AlternateRowBg}" CornerRadius="4" Padding="8,5" Margin="0,0,0,4">
                                             <StackPanel>
                                                 <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Text="{Binding Subtitle}" FontSize="10" Foreground="{StaticResource TextSecondary}" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Text="{Binding Subtitle}" FontSize="10" Foreground="{DynamicResource TextSecondary}" TextTrimming="CharacterEllipsis" />
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>
@@ -388,15 +388,15 @@
         </Grid>
 
         <!-- ============ STATUS BAR ============ -->
-        <Border Grid.Row="2" Background="{StaticResource PanelBg2}" CornerRadius="6" Padding="12,6" Margin="0,10,0,0">
+        <Border Grid.Row="2" Background="{DynamicResource PanelBg2}" CornerRadius="6" Padding="12,6" Margin="0,10,0,0">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding AppCountText}" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
-                    <TextBlock Text="{Binding RetentionText}" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
-                    <TextBlock Text="{Binding ModeText}" Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
-                    <TextBlock Text="{Binding DbSizeText}" Foreground="{StaticResource TextSecondary}" FontSize="12" />
+                    <TextBlock Text="{Binding AppCountText}" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
+                    <TextBlock Text="{Binding RetentionText}" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
+                    <TextBlock Text="{Binding ModeText}" Foreground="{DynamicResource TextSecondary}" FontSize="12" Margin="0,0,16,0" />
+                    <TextBlock Text="{Binding DbSizeText}" Foreground="{DynamicResource TextSecondary}" FontSize="12" />
                 </StackPanel>
-                <TextBlock HorizontalAlignment="Right" Text="{Binding FolderText}" Foreground="{StaticResource TextSecondary}"
+                <TextBlock HorizontalAlignment="Right" Text="{Binding FolderText}" Foreground="{DynamicResource TextSecondary}"
                            FontSize="11" TextTrimming="CharacterEllipsis" MaxWidth="420" ToolTip="{Binding FolderText}" />
             </Grid>
         </Border>

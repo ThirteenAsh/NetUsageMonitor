@@ -22,6 +22,7 @@ public partial class SettingsWindow : Window
         FolderBox.Text = _settings.RecordsFolder;
         RetentionBox.Text = _settings.RetentionMinutes.ToString();
         FlushBox.Text = _settings.FlushIntervalSeconds.ToString();
+        LightThemeBox.IsChecked = _settings.UseLightTheme;
         ModeAll.IsChecked = _settings.TrackingMode == TrackingMode.All;
         ModeOnly.IsChecked = _settings.TrackingMode == TrackingMode.OnlyListed;
         ShowIgnoredBox.IsChecked = _settings.ShowIgnoredInList;
@@ -66,6 +67,7 @@ public partial class SettingsWindow : Window
         _settings.RetentionMinutes = ParseRetention();
         if (int.TryParse(FlushBox.Text, out int flush) && flush >= 1)
             _settings.FlushIntervalSeconds = flush;
+        _settings.UseLightTheme = LightThemeBox.IsChecked == true;
         _settings.TrackingMode = ModeOnly.IsChecked == true ? TrackingMode.OnlyListed : TrackingMode.All;
         _settings.ShowIgnoredInList = ShowIgnoredBox.IsChecked == true;
         _settings.KeepRecordingInBackground = BackgroundBox.IsChecked == true;

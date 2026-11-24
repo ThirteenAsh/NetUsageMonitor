@@ -16,11 +16,6 @@ public sealed class UsageChart : FrameworkElement
     private int _windowMinutes = 60;
     private long _nowUnix;
 
-    private static readonly Brush DownFill = Make(Color.FromArgb(0x55, 0x10, 0xB9, 0x81));
-    private static readonly Pen DownPen = MakePen(Color.FromRgb(0x10, 0xB9, 0x81), 1.5);
-    private static readonly Pen UpPen = MakePen(Color.FromRgb(0x3B, 0x82, 0xF6), 1.5);
-    private static readonly Pen GridPen = MakePen(Color.FromArgb(0x33, 0x9C, 0xA3, 0xAF), 0.5);
-    private static readonly Brush AxisText = Make(Color.FromRgb(0x9C, 0xA3, 0xAF));
     private static readonly Typeface Face = new("Segoe UI");
 
     public void SetData(List<HistoryPoint> points, int windowMinutes, long nowUnix)
@@ -45,17 +40,19 @@ public sealed class UsageChart : FrameworkElement
         const double left = 4, right = 4, top = 14, bottom = 14;
         double plotW = Math.Max(1, w - left - right);
         double plotH = Math.Max(1, h - top - bottom);
+        var gridPen = (Pen)FindResource("ChartGridPen");
+        var axisText = (Brush)FindResource("TextSecondary");
 
         // Horizontal grid lines.
         for (int i = 0; i <= 2; i++)
         {
             double y = top + plotH * i / 2.0;
-            dc.DrawLine(GridPen, new Point(left, y), new Point(left + plotW, y));
+            dc.DrawLine(gridPen, new Point(left, y), new Point(left + plotW, y));
         }
 
         if (_points.Count == 0)
         {
-            DrawText(dc, "此应用暂无历史记录。", left + 4, top + plotH / 2 - 8);
+            DrawText(dc, "此应用暂无历史记录。", axisText, left + 4, top + plotH / 2 - 8);
             return;
         }
 
@@ -80,7 +77,7 @@ public sealed class UsageChart : FrameworkElement
             ctx.LineTo(new Point(X(_points[^1].UnixSeconds), top + plotH), false, false);
         }
         area.Freeze();
-        dc.DrawGeometry(DownFill, DownPen, area);
+        dc.DrawGeometry((Brush)FindResource("ChartDownloadFill"), (Pen)FindResource("ChartDownloadPen"), area);
 
         // Upload line.
         var line = new StreamGeometry();
@@ -91,21 +88,18 @@ public sealed class UsageChart : FrameworkElement
                 ctx.LineTo(new Point(X(p.UnixSeconds), Y(p.Sent)), true, false);
         }
         line.Freeze();
-        dc.DrawGeometry(null, UpPen, line);
+        dc.DrawGeometry(null, (Pen)FindResource("ChartUploadPen"), line);
 
         // Labels: peak (top-left), time span (bottom corners).
-        DrawText(dc, "峰值 " + ByteFormatter.Bytes(maxVal), left + 2, 0);
-        DrawText(dc, $"{_windowMinutes} 分钟前", left + 2, h - 13);
-        DrawText(dc, "现在", left + plotW, h - 13, alignRight: true);
+        DrawText(dc, "峰值 " + ByteFormatter.Bytes(maxVal), axisText, left + 2, 0);
+        DrawText(dc, $"{_windowMinutes} 分钟前", axisText, left + 2, h - 13);
+        DrawText(dc, "现在", axisText, left + plotW, h - 13, alignRight: true);
     }
 
-    private void DrawText(DrawingContext dc, string text, double x, double y, bool alignRight = false)
+    private void DrawText(DrawingContext dc, string text, Brush brush, double x, double y, bool alignRight = false)
     {
         var ft = new FormattedText(text, CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight,
-            Face, 10, AxisText, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+            Face, 10, brush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
         dc.DrawText(ft, new Point(alignRight ? x - ft.Width : x, y));
     }
-
-    private static Brush Make(Color c) { var b = new SolidColorBrush(c); b.Freeze(); return b; }
-    private static Pen MakePen(Color c, double t) { var p = new Pen(Make(c), t); p.Freeze(); return p; }
 }

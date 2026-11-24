@@ -102,9 +102,14 @@ public partial class MainWindow : Window
     private void OnSettingsClick(object sender, RoutedEventArgs e)
     {
         string oldFolder = _vm.Settings.RecordsFolder;
+        bool wasLightTheme = _vm.Settings.UseLightTheme;
 
         var window = new SettingsWindow(_vm.Settings, _vm.Tracker) { Owner = this };
-        window.ShowDialog();
+        if (window.ShowDialog() == true && wasLightTheme != _vm.Settings.UseLightTheme)
+        {
+            ((App)Application.Current).ApplyTheme(_vm.Settings.UseLightTheme);
+            Chart.InvalidateVisual();
+        }
 
         _vm.Settings.Save();
 

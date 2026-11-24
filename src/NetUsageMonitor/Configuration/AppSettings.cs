@@ -69,6 +69,8 @@ public sealed class AppSettings
     /// <summary>How often aggregated samples are flushed to the database, in seconds.</summary>
     public int FlushIntervalSeconds { get; set; } = 5;
 
+    public bool UseLightTheme { get; set; }
+
     /// <summary>When the window is closed, keep the engine running (minimize to tray) instead of stopping.</summary>
     public bool KeepRecordingInBackground { get; set; } = true;
 

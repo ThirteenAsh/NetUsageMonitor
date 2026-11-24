@@ -3,76 +3,82 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Language="zh-CN" Title="设置 - 网络流量监控" Width="560" SizeToContent="Height"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        Background="{StaticResource WindowBg}" Icon="Assets/app.ico">
+        MaxHeight="{Binding Height, Source={x:Static SystemParameters.WorkArea}}"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextPrimary}" Icon="Assets/app.ico">
     <Window.Resources>
         <Style x:Key="Section" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="13" />
             <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{StaticResource Accent}" />
+            <Setter Property="Foreground" Value="{DynamicResource Accent}" />
             <Setter Property="Margin" Value="0,14,0,6" />
         </Style>
         <Style x:Key="Hint" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextSecondary}" />
             <Setter Property="FontSize" Value="11" />
             <Setter Property="TextWrapping" Value="Wrap" />
             <Setter Property="Margin" Value="0,2,0,0" />
         </Style>
     </Window.Resources>
 
-    <StackPanel Margin="18">
-        <!-- Records folder -->
-        <TextBlock Text="记录保存位置" Style="{StaticResource Section}" Margin="0,0,0,6" />
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="FolderBox" IsReadOnly="True" />
-            <Button Grid.Column="1" Content="浏览…" Click="OnBrowse" Style="{StaticResource ToolButton}" Margin="8,0,0,0" />
-        </Grid>
-        <TextBlock Style="{StaticResource Hint}" Text="流量数据库保存在此处，记录流量大小及已启用的连接信息，不保存网络传输内容。" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="18">
+            <TextBlock Text="外观" Style="{StaticResource Section}" Margin="0" />
+            <CheckBox x:Name="LightThemeBox" Content="使用浅色主题" />
 
-        <!-- Retention -->
-        <TextBlock Text="记录保留" Style="{StaticResource Section}" />
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="保留最近" VerticalAlignment="Center" />
-            <TextBox x:Name="RetentionBox" Width="60" Margin="8,0" HorizontalContentAlignment="Center" />
-            <TextBlock Text="分钟的记录" VerticalAlignment="Center" />
+            <!-- Records folder -->
+            <TextBlock Text="记录保存位置" Style="{StaticResource Section}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="FolderBox" IsReadOnly="True" />
+                <Button Grid.Column="1" Content="浏览…" Click="OnBrowse" Style="{StaticResource ToolButton}" Margin="8,0,0,0" />
+            </Grid>
+            <TextBlock Style="{StaticResource Hint}" Text="流量数据库保存在此处，记录流量大小及已启用的连接信息，不保存网络传输内容。" />
+
+            <!-- Retention -->
+            <TextBlock Text="记录保留" Style="{StaticResource Section}" />
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="保留最近" VerticalAlignment="Center" />
+                <TextBox x:Name="RetentionBox" Width="60" Margin="8,0" HorizontalContentAlignment="Center" />
+                <TextBlock Text="分钟的记录" VerticalAlignment="Center" />
+            </StackPanel>
+            <TextBlock Style="{StaticResource Hint}"
+                       Text="超出保留时长的记录会自动删除。对需要长期保存的应用，可在右键菜单选择“永久保留记录”。" />
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <TextBlock Text="每隔" VerticalAlignment="Center" />
+                <TextBox x:Name="FlushBox" Width="50" Margin="8,0" HorizontalContentAlignment="Center" />
+                <TextBlock Text="秒写入一次（间隔越短，记录越细，写入越频繁）" VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextSecondary}" FontSize="11" />
+            </StackPanel>
+
+            <!-- Tracking -->
+            <TextBlock Text="跟踪范围" Style="{StaticResource Section}" />
+            <RadioButton x:Name="ModeAll" GroupName="mode" Foreground="{DynamicResource TextPrimary}" Margin="0,2"
+                         Content="跟踪所有应用（忽略的应用除外）" />
+            <RadioButton x:Name="ModeOnly" GroupName="mode" Foreground="{DynamicResource TextPrimary}" Margin="0,2"
+                         Content="仅跟踪通过“仅跟踪此应用”选定的应用" />
+            <CheckBox x:Name="ShowIgnoredBox" Content="在列表中显示已忽略的应用（灰色显示）" />
+
+            <!-- Background -->
+            <TextBlock Text="后台运行与启动" Style="{StaticResource Section}" />
+            <CheckBox x:Name="BackgroundBox" Content="关闭窗口后继续在后台记录（最小化到托盘）" />
+            <CheckBox x:Name="StartupBox" Content="登录 Windows 时自动启动" />
+            <CheckBox x:Name="StartMinBox" Content="启动时最小化到托盘" />
+
+            <!-- Danger zone -->
+            <TextBlock Text="管理记录" Style="{StaticResource Section}" />
+            <StackPanel Orientation="Horizontal">
+                <Button Content="删除超期记录" Click="OnDeleteOld" Style="{StaticResource ToolButton}" Margin="0,0,8,0" />
+                <Button Content="删除全部记录" Click="OnDeleteAll" Style="{StaticResource ToolButton}" />
+            </StackPanel>
+
+            <!-- Footer -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,22,0,0">
+                <Button Content="取消" Click="OnCancel" Style="{StaticResource ToolButton}" Margin="0,0,8,0" Width="90" />
+                <Button Content="保存" Click="OnSave" Style="{StaticResource AccentButton}" Width="90" />
+            </StackPanel>
         </StackPanel>
-        <TextBlock Style="{StaticResource Hint}"
-                   Text="超出保留时长的记录会自动删除。对需要长期保存的应用，可在右键菜单选择“永久保留记录”。" />
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-            <TextBlock Text="每隔" VerticalAlignment="Center" />
-            <TextBox x:Name="FlushBox" Width="50" Margin="8,0" HorizontalContentAlignment="Center" />
-            <TextBlock Text="秒写入一次（间隔越短，记录越细，写入越频繁）" VerticalAlignment="Center"
-                       Foreground="{StaticResource TextSecondary}" FontSize="11" />
-        </StackPanel>
-
-        <!-- Tracking -->
-        <TextBlock Text="跟踪范围" Style="{StaticResource Section}" />
-        <RadioButton x:Name="ModeAll" GroupName="mode" Foreground="{StaticResource TextPrimary}" Margin="0,2"
-                     Content="跟踪所有应用（忽略的应用除外）" />
-        <RadioButton x:Name="ModeOnly" GroupName="mode" Foreground="{StaticResource TextPrimary}" Margin="0,2"
-                     Content="仅跟踪通过“仅跟踪此应用”选定的应用" />
-        <CheckBox x:Name="ShowIgnoredBox" Content="在列表中显示已忽略的应用（灰色显示）" />
-
-        <!-- Background -->
-        <TextBlock Text="后台运行与启动" Style="{StaticResource Section}" />
-        <CheckBox x:Name="BackgroundBox" Content="关闭窗口后继续在后台记录（最小化到托盘）" />
-        <CheckBox x:Name="StartupBox" Content="登录 Windows 时自动启动" />
-        <CheckBox x:Name="StartMinBox" Content="启动时最小化到托盘" />
-
-        <!-- Danger zone -->
-        <TextBlock Text="管理记录" Style="{StaticResource Section}" />
-        <StackPanel Orientation="Horizontal">
-            <Button Content="删除超期记录" Click="OnDeleteOld" Style="{StaticResource ToolButton}" Margin="0,0,8,0" />
-            <Button Content="删除全部记录" Click="OnDeleteAll" Style="{StaticResource ToolButton}" />
-        </StackPanel>
-
-        <!-- Footer -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,22,0,0">
-            <Button Content="取消" Click="OnCancel" Style="{StaticResource ToolButton}" Margin="0,0,8,0" Width="90" />
-            <Button Content="保存" Click="OnSave" Style="{StaticResource AccentButton}" Width="90" />
-        </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </Window>

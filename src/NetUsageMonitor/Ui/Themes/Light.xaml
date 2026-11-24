@@ -1,0 +1,28 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <SolidColorBrush x:Key="WindowBg" Color="#F1F5F9" />
+    <SolidColorBrush x:Key="PanelBg" Color="#EAF0F6" />
+    <SolidColorBrush x:Key="PanelBg2" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="BorderBrush" Color="#B9C7D7" />
+    <SolidColorBrush x:Key="TextPrimary" Color="#152438" />
+    <SolidColorBrush x:Key="TextSecondary" Color="#4B5F73" />
+    <SolidColorBrush x:Key="Accent" Color="#1E53BA" />
+    <SolidColorBrush x:Key="AccentGreen" Color="#0A7457" />
+    <SolidColorBrush x:Key="RowHover" Color="#E5F0FC" />
+    <SolidColorBrush x:Key="Selection" Color="#D6E8FC" />
+    <SolidColorBrush x:Key="AlternateRowBg" Color="#F5F8FC" />
+    <SolidColorBrush x:Key="PrimaryButtonBg" Color="#1D4ED8" />
+    <SolidColorBrush x:Key="PrimaryButtonHover" Color="#1E40AF" />
+    <SolidColorBrush x:Key="BlockedBadgeBg" Color="#B32630" />
+    <SolidColorBrush x:Key="LimitBadgeBg" Color="#9A4318" />
+    <SolidColorBrush x:Key="StatusBlocked" Color="#C3212F" />
+    <SolidColorBrush x:Key="StatusCapped" Color="#C25314" />
+    <SolidColorBrush x:Key="StatusKept" Color="#92600A" />
+    <SolidColorBrush x:Key="StatusIgnored" Color="#66758A" />
+    <SolidColorBrush x:Key="StatusIdle" Color="#A1ADBB" />
+
+    <SolidColorBrush x:Key="ChartDownloadFill" Color="#2B0A7457" />
+    <Pen x:Key="ChartDownloadPen" Brush="{StaticResource AccentGreen}" Thickness="1.5" />
+    <Pen x:Key="ChartUploadPen" Brush="{StaticResource Accent}" Thickness="1.5" />
+    <Pen x:Key="ChartGridPen" Brush="#CFDAE6" Thickness="0.5" />
+</ResourceDictionary>

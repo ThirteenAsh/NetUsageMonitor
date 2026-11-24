@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Language="zh-CN" Title="设置流量限额" Width="400" SizeToContent="Height"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
-        Background="{StaticResource WindowBg}" Icon="Assets/app.ico">
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextPrimary}" Icon="Assets/app.ico">
     <Window.Resources>
         <DataTemplate x:Key="LimitOptionText">
             <TextBlock Text="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
@@ -25,7 +25,7 @@
             </ComboBox>
         </StackPanel>
         <TextBlock Text="达到限额后会禁止此应用联网，并发送通知。可随时重置计数或移除限额。"
-                   Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" />
+                   Foreground="{DynamicResource TextSecondary}" FontSize="11" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button Content="取消" Click="OnCancel" Style="{StaticResource ToolButton}" Width="90" Margin="0,0,8,0" />
             <Button Content="保存限额" Click="OnOk" Style="{StaticResource AccentButton}" Width="90" />

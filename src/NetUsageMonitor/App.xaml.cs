@@ -30,8 +30,9 @@ public partial class App : Application
 
     private bool _trayBalloonShown;
     private bool _faultReported;
+    private volatile bool _isExiting;
 
-    public bool IsExiting { get; private set; }
+    public bool IsExiting => _isExiting;
     public AppSettings Settings => _settings;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -83,15 +84,13 @@ public partial class App : Application
     {
         var thread = new Thread(() =>
         {
-            while (!IsExiting)
+            try
             {
-                try
-                {
-                    if (_showEvent!.WaitOne())
-                        Dispatcher.BeginInvoke(ShowMainWindow);
-                }
-                catch { break; }
+                // ExitApp uses the same signal to wake the listener for shutdown.
+                while (_showEvent!.WaitOne() && !IsExiting)
+                    Dispatcher.BeginInvoke(ShowMainWindow);
             }
+            catch { /* stop listening */ }
         })
         { IsBackground = true, Name = "ShowSignalListener" };
         thread.Start();
@@ -151,7 +150,8 @@ public partial class App : Application
 
     public void ShowMainWindow()
     {
-        if (_mainWindow is null) return;
+        // A show request can already be queued when shutdown starts.
+        if (IsExiting || _mainWindow is null) return;
         _mainWindow.Show();
         if (_mainWindow.WindowState == WindowState.Minimized)
             _mainWindow.WindowState = WindowState.Normal;
@@ -177,7 +177,7 @@ public partial class App : Application
     public void ExitApp()
     {
         if (IsExiting) return;
-        IsExiting = true;
+        _isExiting = true;
 
         try { _showEvent?.Set(); } catch { /* unblock listener */ }
 

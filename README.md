@@ -1,164 +1,112 @@
-# NetUsage Monitor
+# 网络流量监控（NetUsage Monitor）
 
-**See exactly which apps are using your internet — live and over the last hour — on Windows.**
-
-NetUsage Monitor is a lightweight, high-performance desktop app that shows the **live network
-usage of every application** (download/upload speed) plus a **rolling history** of how much each
-app has used. It groups multiple instances of the same program together (like Task Manager), shows
-each app's **name and icon**, and lets you **keep**, **ignore**, or **focus on** specific apps.
-
-It records **only the amount of data** used (KB / MB / GB) — never the contents of your traffic.
+在 Windows 上查看每个应用的实时下载和上传速度，以及一段时间内累计使用了多少流量。程序按可执行文件路径归并同一应用的多个进程，并显示应用名称和图标。
 
 <p align="center">
-  <img src="docs/preview.svg" alt="NetUsage Monitor screenshot" width="780">
+  <img src="docs/preview.svg" alt="网络流量监控界面示意图" width="780">
 </p>
 
-> Keywords: windows network usage monitor · per-app bandwidth · data usage · per-process network ·
-> background data tracker · which app is using my internet · bandwidth monitor · network meter
+## 功能
 
----
+- **实时流量与历史记录** — 每秒更新各应用的上传和下载速度。默认保留最近 60 分钟的流量记录，并按保留时长计算每分钟平均值。
+- **按应用跟踪** — 可以永久保留指定应用的流量记录、忽略指定应用，或仅跟踪选定的应用。
+- **联网控制** — 通过 Windows 防火墙禁止或恢复指定应用联网。可设置累计、每日或每月流量限额，达到限额后自动禁止联网并发送通知。
+- **连接记录** — 可按应用启用，查看远程 IP 地址、端口和可解析的域名。连接记录可手动清除，到期后会自动清理。
+- **搜索与排序** — 按应用名称或路径搜索，点击表头排序，也可以开启自动排序。
+- **暂停视图与暂停记录** — 暂停视图便于查看列表和选择应用，后台会继续记录。需要停止采集时，可在工具栏或托盘菜单暂停记录。
+- **后台运行** — 支持关闭窗口后继续记录、登录 Windows 时自动启动，以及启动时最小化到托盘。
+- **记录管理** — 可选择数据库保存位置、删除指定应用的记录或清理超期记录，也可将当前列表导出为 CSV。
+- **结束进程** — 可以从右键菜单或详情面板结束应用进程。
 
-## Features
+## 下载与运行
 
-- 📊 **Live per-app usage** — download and upload speed for every process, updated every second.
-- 🕑 **History & averages** — keeps the **last hour** by default (auto-pruned) and shows per-minute averages.
-- ♾️ **Keep forever** — mark specific apps to **record indefinitely** (their history is never deleted).
-- 🚫 **Block internet per app** — one-click cut an app's internet on/off (Windows Firewall).
-- 📉 **Data caps** — set a limit (total/daily/monthly); when an app reaches it, it's **auto-blocked and you're notified**. Resettable.
-- 🌐 **Connection recording** — optionally record the **domains/IPs** an app talks to (toggle per app, deletable, auto-pruned).
-- ⏸️ **Pause the view** — freeze the list so you can read/click while recording keeps running.
-- 🧩 **Grouping** — all instances of one program (e.g. every `chrome.exe`) are combined into one row.
-- 🖼️ **Names + icons** — apps are shown by friendly name and their real icon, like Task Manager.
-- 🔍 **Search & sort** — filter by name/path and sort by any column (optional live auto-sort).
-- 🎯 **Focus / ignore** — *Only track this app*, or *Ignore* apps you don't care about.
-- 🗂️ **Choose where records live** — pick any folder for the records database.
-- 🔌 **Runs in the background** — closing the window minimizes to the tray and keeps recording.
-- 🚀 **Start with Windows** — optional auto-start (minimized) at sign-in.
-- 🗑️ **Full control of data** — delete one app's records, old records, or everything, anytime.
-- 📤 **Export** — export the current view to CSV.
-- 🔒 **Private** — stores byte counts (and, if you enable it, domains) only; no packet contents, nothing leaves your PC.
+1. 前往 [GitHub 发布页](../../releases) 下载 `NetUsageMonitor.exe`。若要使用与当前源码一致的简体中文版，可以[从源码构建](#从源码构建)。
+2. 双击 EXE，确认 Windows 的管理员权限提示。也可以右键选择 **以管理员身份运行**。
+3. 主窗口会显示正在使用网络的应用，默认按 **↓ 下载速度** 排序。可以右键点击任务栏图标，将程序固定到任务栏。
+4. 如需后台运行，可在 **设置** 中启用 **关闭窗口后继续在后台记录（最小化到托盘）**。如需开机自启，可勾选 **登录 Windows 时自动启动**。
 
-> **Honest limits (no kernel driver):** full HTTPS **URLs** and raw **packet payloads** can't be captured without a packet driver and stay encrypted regardless — connection recording shows **domains/IPs**, not full URLs. Speed **throttling** isn't included; use **block** or **data caps** to control heavy apps.
+发布产物是自包含的 Windows x64 单文件 EXE，下载后即可运行。
 
----
+## 常用操作
 
-## Download & run
+| 目标 | 操作 |
+| --- | --- |
+| 永久保留某个应用的流量记录 | 右键该应用 → **永久保留记录** |
+| 停止跟踪某个应用 | 右键该应用 → **忽略此应用（停止记录）** |
+| 只跟踪某个应用 | 右键该应用 → **仅跟踪此应用** |
+| 恢复跟踪全部应用 | 右键菜单 → **跟踪所有应用** |
+| 禁止或恢复某个应用联网 | 选中该应用，在右侧点击 **禁止联网** 或 **恢复联网** |
+| 设置流量限额 | 选中该应用，点击 **设置限额**，输入额度并选择统计周期 |
+| 查看某个应用的连接记录 | 选中该应用，点击 **记录连接** |
+| 冻结列表以便选中某一项 | 工具栏 → **暂停视图** |
+| 暂停或继续采集 | 点击工具栏的记录状态按钮，或在托盘菜单选择 **暂停或继续记录** |
+| 修改历史记录保留时长 | **设置** → **记录保留** |
+| 修改数据库保存位置 | **设置** → **记录保存位置** → **浏览…** |
+| 删除流量记录 | 右键应用 → **删除此应用的记录**，或前往 **设置** → **管理记录** |
+| 导出当前列表 | 工具栏 → **导出**，保存为带中文表头的 CSV |
+| 完全退出程序 | 右键系统托盘中的图标 → **退出** |
 
-1. Go to the [**Releases**](../../releases) page and download `NetUsageMonitor.exe`.
-2. **Right-click → Run as administrator.** *(Required — see [Why administrator?](#why-administrator))*
-3. The window opens with a live list of apps using the internet.
-4. *(Optional)* **Pin to taskbar:** right-click the taskbar icon → *Pin to taskbar*.
-5. *(Optional)* Open **⚙ Settings** → enable **Start with Windows** and **Keep recording in the background**.
+## 工作原理
 
-It's a **single self-contained `.exe`** — no installer and no need to install .NET.
+- **采集** — 通过 Windows ETW（Windows 事件跟踪）的内核 TCP/UDP 事件统计每个进程的发送和接收字节数。
+- **汇总** — 按可执行文件路径归并同一应用的多个实例，每秒更新一次实时流量。
+- **存储** — 将汇总数据定期批量写入本地 SQLite 数据库，并自动清理超出保留时长的记录。标记为 **永久保留记录** 的应用可保留更早的流量记录。
+- **联网控制** — 使用 Windows 防火墙执行禁止或恢复联网。当前提供联网开关和流量限额。
 
----
+## 隐私与记录范围
 
-## How to use it
+流量记录保存发送和接收的字节数。按应用启用连接记录后，还会保存远程 IP 地址、端口、协议、连接次数和可解析的域名。记录保存在本地数据库中，应用不会上传这些记录。程序不保存数据包内容或 HTTPS 完整网址。
 
-| I want to… | Do this |
-|---|---|
-| See what's using the internet right now | Just open it — sort by **↓ Rate** (default). |
-| Keep a specific app's history forever | Right-click the app → **Keep records indefinitely**. |
-| Stop recording an app entirely | Right-click → **Ignore this app**. |
-| Record only one (or a few) apps | Right-click → **Only track this app** (switches to "only selected" mode). |
-| Go back to recording everything | Right-click → **Track all apps**. |
-| Cut an app's internet completely | Select it → **Block internet** in the right panel. |
-| Auto-block an app at a data limit | Select it → **Set / change limit** → amount + total/daily/monthly. |
-| See the domains/IPs an app uses | Select it → **Record connections** → list appears in the panel. |
-| Freeze the list so I can click | Top bar **⏸ Pause view** (recording keeps running). |
-| Change how long history is kept | **⚙ Settings → Retention**. |
-| Choose where records are stored | **⚙ Settings → Records location → Browse**. |
-| Delete records | Right-click an app → *Delete this app's records*, or **⚙ Settings → Manage records**. |
-| Keep recording after closing the window | It minimizes to the tray automatically (toggle in Settings). To fully quit, use the **tray icon → Exit**. |
-| Pause/resume all recording | Top bar **Recording** button, or tray menu. |
+## 常见问题
 
----
+### 为什么需要管理员权限
 
-## How it works
+读取本项目使用的 Windows ETW 内核网络事件需要管理员权限，程序启动时会自动申请提权。启用 **登录 Windows 时自动启动** 后，程序会创建一个 Windows 计划任务，在登录时以管理员权限启动。
 
-- **Measurement:** uses Windows **ETW** (Event Tracing for Windows) kernel TCP/UDP providers — the
-  same data source Task Manager and Resource Monitor use — to count bytes sent/received **per
-  process**. This is accurate and low-overhead (no packet capture, no network driver, no proxy).
-- **Live vs. history:** byte counts are aggregated each second for the live view and written to a
-  local **SQLite** database every few seconds for history.
-- **Retention:** a background task deletes samples older than your retention window (default 60
-  minutes) — **except** for apps you marked *Keep records indefinitely*.
-- **Grouping:** apps are grouped by their executable path, so multiple processes of the same program
-  share one row and one total.
-- **Performance:** the hot path only does interlocked counter increments; resolving names/icons is
-  cached; database writes are batched. Typical CPU use is negligible.
+### 记录保存在哪里
 
----
+默认数据库路径是 `%LOCALAPPDATA%\NetUsageMonitor\netusage.db`，可在 **设置** 中更改保存目录。用户设置保存在 `%APPDATA%\NetUsageMonitor\settings.json`。
 
-## Privacy
+### 会影响电脑性能或网速吗
 
-NetUsage Monitor records **how much** data each app transfers — never **what** it transfers.
-There is no packet inspection, no hostnames, no payloads. All data stays in a local database in the
-folder you choose. Nothing is uploaded anywhere.
+程序通过 ETW 读取计数并批量写入数据库，日常监控开销较低。实时采集无需代理，也不会转发网络流量。
 
----
+### 关闭窗口后还会继续记录吗
 
-## FAQ
+默认会继续记录，程序会最小化到托盘。关闭该设置或从托盘菜单选择 **退出**，即可结束后台运行。
 
-### Why administrator?
-Reading **per-application** network byte counts on Windows requires an ETW kernel session, which
-needs administrator rights. There is no non-admin Windows API that attributes bandwidth to a
-specific process. The app requests elevation automatically (UAC prompt) on launch. To avoid the
-prompt at sign-in, enabling **Start with Windows** installs a scheduled task that launches it
-elevated without prompting.
+## 从源码构建
 
-### Where are my records stored?
-By default in `%LOCALAPPDATA%\NetUsageMonitor\netusage.db`. Change it in **⚙ Settings**.
-Settings live in `%APPDATA%\NetUsageMonitor\settings.json`.
-
-### Does it slow down my PC or internet?
-No. It only listens to lightweight kernel counters and batches small database writes. It does not
-sit in your network path, so it cannot slow your connection.
-
-### Will it record while I'm not looking?
-Yes, if **Keep recording in the background** is on (default) — closing the window minimizes it to
-the tray and recording continues. Use the tray icon's **Exit** to stop completely.
-
----
-
-## Build from source
-
-Requirements: [.NET 8 SDK](https://dotnet.microsoft.com/download) on Windows x64.
+在 Windows x64 上安装 [.NET 8 SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet/8.0)，然后运行以下命令。首次构建会自动下载项目依赖。
 
 ```powershell
-git clone https://github.com/<your-username>/NetUsageMonitor.git
+git clone https://github.com/ThirteenAsh/NetUsageMonitor.git
 cd NetUsageMonitor
 powershell -ExecutionPolicy Bypass -File build.ps1
-# -> dist\NetUsageMonitor.exe
+# 输出文件为 dist\NetUsageMonitor.exe
 ```
 
-Or directly:
+也可以直接发布项目。
 
 ```powershell
 dotnet publish src/NetUsageMonitor/NetUsageMonitor.csproj -c Release
 ```
 
-### Project layout
+### 项目结构
 
-```
+```text
 src/NetUsageMonitor/
-  Engine/        ETW capture, process identity, the per-second tracker
-  Storage/       SQLite database (samples, retention, history)
-  ViewModels/    MVVM view models and commands
-  Ui/            converters, icon provider, the history chart, auto-start
-  Configuration/ settings model + JSON persistence
-  *.xaml         App, MainWindow, SettingsWindow
-tools/           icon generator + headless test probes
-.github/workflows/release.yml   tag a vX.Y.Z to build + publish a release
+  Engine/          ETW 流量采集、进程识别与汇总
+  Storage/         SQLite 数据库、历史记录与清理
+  Network/         防火墙规则与域名反向解析
+  ViewModels/      界面状态与操作命令
+  Ui/              图表、显示转换、图标与开机自启
+  Configuration/   设置模型与 JSON 配置
+  *.xaml           应用资源、主窗口、设置窗口与流量限额对话框
+tools/             图标生成脚本与测试工具
+.github/workflows/ GitHub Releases 构建和发布流程
 ```
 
----
+## 技术栈与许可证
 
-## Tech
-
-C# · .NET 8 · WPF · ETW (`Microsoft.Diagnostics.Tracing.TraceEvent`) · SQLite (`Microsoft.Data.Sqlite`).
-
-## License
-
-[MIT](LICENSE).
+C#、.NET 8、WPF、Windows ETW（`Microsoft.Diagnostics.Tracing.TraceEvent`）与 SQLite（`Microsoft.Data.Sqlite`）。项目采用 [MIT 许可证](LICENSE)。

@@ -12,7 +12,7 @@ public partial class CapDialog : Window
     public CapDialog(string appName, AppCap? existing)
     {
         InitializeComponent();
-        HeaderText.Text = $"Block \"{appName}\" when it uses more than:";
+        HeaderText.Text = $"为“{appName}”设置流量限额";
 
         if (existing is { LimitBytes: > 0 })
         {
@@ -35,7 +35,7 @@ public partial class CapDialog : Window
     {
         if (!double.TryParse(AmountBox.Text, out double amount) || amount <= 0)
         {
-            MessageBox.Show("Enter a number greater than zero.", "Set data limit",
+            MessageBox.Show("请输入大于零的数值。", "设置流量限额",
                 MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }

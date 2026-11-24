@@ -82,6 +82,7 @@ public sealed class UsageTracker : IDisposable
     private int _pruneCountdown;
     private long _dbSize;
     private Dictionary<string, UsageTotal> _hourTotals = new(StringComparer.OrdinalIgnoreCase);
+    private int _hourTotalsMinutes;
 
     private readonly ConcurrentQueue<ConnectionEvent> _connQueue = new();
     private readonly ReverseDnsResolver _dns;
@@ -90,6 +91,7 @@ public sealed class UsageTracker : IDisposable
     public UsageTracker(AppSettings settings)
     {
         _settings = settings;
+        _hourTotalsMinutes = settings.RetentionMinutes;
         _database.Open(_settings.DatabasePath);
         _dns = new ReverseDnsResolver((ip, host) =>
         {
@@ -207,7 +209,9 @@ public sealed class UsageTracker : IDisposable
             {
                 _flushCountdown = Math.Max(1, _settings.FlushIntervalSeconds);
                 FlushPending(now);
-                _hourTotals = _database.GetTotalsSince(now - _settings.RetentionMinutes * 60L);
+                int minutes = _settings.RetentionMinutes;
+                _hourTotals = _database.GetTotalsSince(now - minutes * 60L);
+                _hourTotalsMinutes = minutes;
                 _dbSize = _database.GetDatabaseSizeBytes();
                 EvaluateCaps(now);
             }
@@ -348,7 +352,7 @@ public sealed class UsageTracker : IDisposable
         {
             Groups = groups,
             DatabaseSizeBytes = _dbSize,
-            RetentionMinutes = _settings.RetentionMinutes,
+            RetentionMinutes = _hourTotalsMinutes,
             IsRecording = IsRecording
         });
     }

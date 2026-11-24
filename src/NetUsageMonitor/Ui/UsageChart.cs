@@ -55,7 +55,7 @@ public sealed class UsageChart : FrameworkElement
 
         if (_points.Count == 0)
         {
-            DrawText(dc, "No recorded history yet for this app.", left + 4, top + plotH / 2 - 8);
+            DrawText(dc, "此应用暂无历史记录。", left + 4, top + plotH / 2 - 8);
             return;
         }
 
@@ -94,16 +94,16 @@ public sealed class UsageChart : FrameworkElement
         dc.DrawGeometry(null, UpPen, line);
 
         // Labels: peak (top-left), time span (bottom corners).
-        DrawText(dc, "peak " + ByteFormatter.Bytes(maxVal), left + 2, 0);
-        DrawText(dc, $"-{_windowMinutes} min", left + 2, h - 13);
-        DrawText(dc, "now", left + plotW - 22, h - 13);
+        DrawText(dc, "峰值 " + ByteFormatter.Bytes(maxVal), left + 2, 0);
+        DrawText(dc, $"{_windowMinutes} 分钟前", left + 2, h - 13);
+        DrawText(dc, "现在", left + plotW, h - 13, alignRight: true);
     }
 
-    private void DrawText(DrawingContext dc, string text, double x, double y)
+    private void DrawText(DrawingContext dc, string text, double x, double y, bool alignRight = false)
     {
         var ft = new FormattedText(text, CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight,
             Face, 10, AxisText, VisualTreeHelper.GetDpi(this).PixelsPerDip);
-        dc.DrawText(ft, new Point(x, y));
+        dc.DrawText(ft, new Point(alignRight ? x - ft.Width : x, y));
     }
 
     private static Brush Make(Color c) { var b = new SolidColorBrush(c); b.Freeze(); return b; }

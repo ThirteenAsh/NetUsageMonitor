@@ -115,7 +115,7 @@ public sealed class MainViewModel : ObservableObject
         set { if (SetProperty(ref _isPaused, value)) OnPropertyChanged(nameof(PauseButtonText)); }
     }
 
-    public string PauseButtonText => IsPaused ? "▶ Resume view" : "⏸ Pause view";
+    public string PauseButtonText => IsPaused ? "▶ 恢复视图" : "⏸ 暂停视图";
 
     public bool AutoSort
     {
@@ -158,7 +158,7 @@ public sealed class MainViewModel : ObservableObject
         private set { if (SetProperty(ref _isRecording, value)) OnPropertyChanged(nameof(RecordingText)); }
     }
 
-    public string RecordingText => IsRecording ? "Recording" : "Paused";
+    public string RecordingText => IsRecording ? "正在记录" : "记录已暂停";
 
     public AppSettings Settings => _settings;
     public UsageTracker Tracker => _tracker;
@@ -182,15 +182,15 @@ public sealed class MainViewModel : ObservableObject
                 _rowMap[g.GroupKey] = row;
                 Rows.Add(row);
             }
-            row.Update(g, _icons);
+            row.Update(g, _icons, snapshot.RetentionMinutes);
             downRate += g.RecvRate;
             upRate += g.SentRate;
         }
 
         TotalDownText = ByteFormatter.Rate(downRate);
         TotalUpText = ByteFormatter.Rate(upRate);
-        DbSizeText = "Records: " + ByteFormatter.Bytes(snapshot.DatabaseSizeBytes);
-        AppCountText = $"{Rows.Count} apps";
+        DbSizeText = "记录占用：" + ByteFormatter.Bytes(snapshot.DatabaseSizeBytes);
+        AppCountText = $"{Rows.Count} 个应用";
         IsRecording = snapshot.IsRecording;
 
         SnapshotApplied?.Invoke();
@@ -252,8 +252,8 @@ public sealed class MainViewModel : ObservableObject
     {
         if (row is null) return;
         var answer = MessageBox.Show(
-            $"Delete all stored records for \"{row.DisplayName}\"?\nLive monitoring continues.",
-            "Delete records", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+            $"要删除“{row.DisplayName}”的全部已保存记录吗？\n实时监控仍会继续。",
+            "删除记录", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
         if (answer == System.Windows.MessageBoxResult.Yes)
             _tracker.Database.DeleteApp(row.GroupKey);
     }
@@ -274,8 +274,8 @@ public sealed class MainViewModel : ObservableObject
     private void DeleteAllRecords()
     {
         var answer = MessageBox.Show(
-            "Delete ALL stored records?\nThis cannot be undone. Live monitoring continues.",
-            "Delete all records", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+            "要删除全部已保存的记录吗？\n此操作无法撤销。实时监控仍会继续。",
+            "删除全部记录", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
         if (answer == System.Windows.MessageBoxResult.Yes)
             _tracker.Database.DeleteAllSamples();
     }
@@ -300,8 +300,8 @@ public sealed class MainViewModel : ObservableObject
                 _dispatcher.Invoke(() =>
                 {
                     row.IsBlocked = !newState;
-                    MessageBox.Show("Could not change the firewall rule.\nMake sure NetUsage Monitor is running as administrator.",
-                        "NetUsage Monitor", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    MessageBox.Show("无法修改防火墙规则。\n请确认程序正在以管理员身份运行。",
+                        App.DisplayName, System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 });
         });
     }
@@ -319,8 +319,8 @@ public sealed class MainViewModel : ObservableObject
     {
         if (row is null) return;
         var answer = MessageBox.Show(
-            $"Delete recorded connections for \"{row.DisplayName}\"?",
-            "Delete connections", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
+            $"要清除“{row.DisplayName}”的连接记录吗？",
+            "清除连接记录", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Warning);
         if (answer == System.Windows.MessageBoxResult.Yes)
             _tracker.Database.DeleteConnections(row.GroupKey);
     }
@@ -376,34 +376,34 @@ public sealed class MainViewModel : ObservableObject
             var processes = Process.GetProcessesByName(Path.GetFileNameWithoutExtension(exe));
             if (processes.Length == 0)
             {
-                MessageBox.Show($"No running process found for \"{row.DisplayName}\".",
-                    "Kill Process", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                MessageBox.Show($"找不到“{row.DisplayName}”正在运行的进程。",
+                    "结束进程", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 return;
             }
             if (processes.Length == 1)
             {
                 processes[0].Kill();
-                MessageBox.Show($"Process \"{row.DisplayName}\" has been terminated.",
-                    "Kill Process", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                MessageBox.Show($"已结束“{row.DisplayName}”的进程。",
+                    "结束进程", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
             else
             {
                 var answer = MessageBox.Show(
-                    $"Found {processes.Length} instances of \"{row.DisplayName}\". Kill all of them?",
-                    "Kill Process", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
+                    $"找到“{row.DisplayName}”的 {processes.Length} 个进程。要全部结束吗？",
+                    "结束进程", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question);
                 if (answer == System.Windows.MessageBoxResult.Yes)
                 {
                     foreach (var p in processes)
                         p.Kill();
-                    MessageBox.Show($"All {processes.Length} instances have been terminated.",
-                        "Kill Process", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+                    MessageBox.Show($"已结束全部 {processes.Length} 个进程。",
+                        "结束进程", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
                 }
             }
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Could not kill process: {ex.Message}",
-                "Kill Process", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            MessageBox.Show($"无法结束进程：{ex.Message}",
+                "结束进程", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -411,14 +411,24 @@ public sealed class MainViewModel : ObservableObject
     {
         var dialog = new Microsoft.Win32.SaveFileDialog
         {
-            Title = "Export current view to CSV",
-            Filter = "CSV file (*.csv)|*.csv",
-            FileName = $"netusage-{DateTime.Now:yyyyMMdd-HHmm}.csv"
+            Title = "将当前列表导出为 CSV",
+            Filter = "CSV 文件 (*.csv)|*.csv",
+            FileName = $"流量记录-{DateTime.Now:yyyyMMdd-HHmm}.csv"
         };
         if (dialog.ShowDialog() != true) return;
 
+        try { WriteCsv(dialog.FileName); }
+        catch (Exception ex)
+        {
+            MessageBox.Show("无法写入文件：" + ex.Message, "导出流量记录",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+    }
+
+    private void WriteCsv(string path)
+    {
         var sb = new StringBuilder();
-        sb.AppendLine("App,Path,DownRateBytesPerSec,UpRateBytesPerSec,DownLastHourBytes,UpLastHourBytes,SessionDownBytes,SessionUpBytes,Status");
+        sb.AppendLine("应用,路径,下载速度（字节/秒）,上传速度（字节/秒）,时段下载（字节）,时段上传（字节）,本次运行下载（字节）,本次运行上传（字节）,状态");
         foreach (ProcessRowViewModel r in RowsView)
         {
             sb.AppendLine(string.Join(",",
@@ -426,20 +436,19 @@ public sealed class MainViewModel : ObservableObject
                 ((long)r.DownRate), ((long)r.UpRate),
                 r.DownHour, r.UpHour, r.SessionDown, r.SessionUp, Csv(r.StatusText)));
         }
-        try { File.WriteAllText(dialog.FileName, sb.ToString()); }
-        catch (Exception ex) { MessageBox.Show("Could not write file: " + ex.Message); }
+        File.WriteAllText(path, sb.ToString(), new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
     }
 
     private static string Csv(string s)
-        => s.Contains(',') || s.Contains('"') ? "\"" + s.Replace("\"", "\"\"") + "\"" : s;
+        => s.IndexOfAny([',', '"', '\r', '\n']) >= 0 ? "\"" + s.Replace("\"", "\"\"") + "\"" : s;
 
     // ---- Status strings -----------------------------------------------------
 
     public void UpdateStatusStrings()
     {
         int kept = _settings.GetKeptKeysSnapshot().Length;
-        RetentionText = $"Keeping last {_settings.RetentionMinutes} min" + (kept > 0 ? $" · {kept} kept forever" : "");
+        RetentionText = $"保留最近 {_settings.RetentionMinutes} 分钟" + (kept > 0 ? $" · {kept} 个应用永久保留" : "");
         FolderText = _settings.RecordsFolder;
-        ModeText = _settings.TrackingMode == TrackingMode.All ? "Tracking: all apps" : "Tracking: only selected";
+        ModeText = _settings.TrackingMode == TrackingMode.All ? "跟踪所有应用" : "仅跟踪选定应用";
     }
 }

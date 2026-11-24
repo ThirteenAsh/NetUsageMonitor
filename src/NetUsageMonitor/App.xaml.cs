@@ -14,6 +14,7 @@ namespace NetUsageMonitor;
 
 public partial class App : Application
 {
+    internal const string DisplayName = "网络流量监控";
     private const string InstanceMutexName = @"Local\NetUsageMonitor.Instance";
     private const string ShowEventName = @"Local\NetUsageMonitor.ShowWindow";
 
@@ -50,7 +51,7 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            MessageBox.Show("Unexpected error: " + args.Exception.Message, "NetUsage Monitor",
+            MessageBox.Show("发生意外错误：" + args.Exception.Message, DisplayName,
                 MessageBoxButton.OK, MessageBoxImage.Error);
             args.Handled = true;
         };
@@ -123,16 +124,16 @@ public partial class App : Application
     {
         _trayIcon = new WinForms.NotifyIcon
         {
-            Text = "NetUsage Monitor",
+            Text = DisplayName,
             Visible = true,
             Icon = LoadTrayIcon()
         };
 
         var menu = new WinForms.ContextMenuStrip();
-        menu.Items.Add("Open NetUsage Monitor", null, (_, _) => ShowMainWindow());
-        menu.Items.Add("Pause / resume recording", null, (_, _) => _viewModel.ToggleRecordingCommand.Execute(null));
+        menu.Items.Add($"打开{DisplayName}", null, (_, _) => ShowMainWindow());
+        menu.Items.Add("暂停或继续记录", null, (_, _) => _viewModel.ToggleRecordingCommand.Execute(null));
         menu.Items.Add(new WinForms.ToolStripSeparator());
-        menu.Items.Add("Exit", null, (_, _) => ExitApp());
+        menu.Items.Add("退出", null, (_, _) => ExitApp());
         _trayIcon.ContextMenuStrip = menu;
         _trayIcon.DoubleClick += (_, _) => ShowMainWindow();
     }
@@ -167,8 +168,8 @@ public partial class App : Application
         if (!_trayBalloonShown && _trayIcon != null)
         {
             _trayBalloonShown = true;
-            _trayIcon.ShowBalloonTip(3000, "Still recording",
-                "NetUsage Monitor keeps recording in the background. Right-click the tray icon to exit.",
+            _trayIcon.ShowBalloonTip(3000, "正在后台记录",
+                "关闭窗口后仍会继续记录流量。如需退出，请右键单击托盘图标。",
                 WinForms.ToolTipIcon.Info);
         }
     }
@@ -198,9 +199,9 @@ public partial class App : Application
         Dispatcher.BeginInvoke(() =>
         {
             if (!_settings.NotifyOnCap) return;
-            _trayIcon?.ShowBalloonTip(6000, "Data limit reached",
-                $"{n.DisplayName} reached its limit " +
-                $"({ByteFormatter.Bytes(n.UsedBytes)} / {ByteFormatter.Bytes(n.LimitBytes)}) and its internet was blocked.",
+            _trayIcon?.ShowBalloonTip(6000, "已达流量限额",
+                $"“{n.DisplayName}”已达到流量限额" +
+                $"（{ByteFormatter.Bytes(n.UsedBytes)} / {ByteFormatter.Bytes(n.LimitBytes)}），已禁止联网。",
                 WinForms.ToolTipIcon.Warning);
         });
     }
@@ -213,10 +214,9 @@ public partial class App : Application
             if (_faultReported) return;
             _faultReported = true;
             MessageBox.Show(
-                "Network capture could not run.\n\n" + ex.Message +
-                "\n\nThis app needs to run as administrator to read per-app network usage. " +
-                "Close it and choose \"Run as administrator\".",
-                "NetUsage Monitor", MessageBoxButton.OK, MessageBoxImage.Warning);
+                "无法启动流量采集。\n\n" + ex.Message +
+                "\n\n读取各应用的网络流量需要管理员权限。请退出程序，再选择“以管理员身份运行”。",
+                DisplayName, MessageBoxButton.OK, MessageBoxImage.Warning);
         });
     }
 

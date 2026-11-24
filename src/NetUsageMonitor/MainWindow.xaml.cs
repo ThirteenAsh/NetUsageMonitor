@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Windows;
 using NetUsageMonitor.Common;
@@ -76,8 +77,9 @@ public partial class MainWindow : Window
         ConnectionsList.ItemsSource = conns.Select(c =>
         {
             string title = string.IsNullOrEmpty(c.Host) ? c.RemoteIp : c.Host!;
-            string last = DateTimeOffset.FromUnixTimeSeconds(c.LastSeen).LocalDateTime.ToString("MMM d, HH:mm");
-            return new ConnectionDisplay(title, $"{c.RemoteIp}:{c.Port} · {c.Proto} · {c.Hits} hits · {last}");
+            string last = DateTimeOffset.FromUnixTimeSeconds(c.LastSeen).LocalDateTime
+                .ToString("M月d日 HH:mm", CultureInfo.InvariantCulture);
+            return new ConnectionDisplay(title, $"{c.RemoteIp}:{c.Port} · {c.Proto} · {c.Hits} 次 · {last}");
         }).ToList();
     }
 
@@ -111,7 +113,7 @@ public partial class MainWindow : Window
             try { _vm.Tracker.RebindDatabase(_vm.Settings.DatabasePath); }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not switch records folder: " + ex.Message, "NetUsage Monitor",
+                MessageBox.Show("无法切换记录保存位置：" + ex.Message, App.DisplayName,
                     MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }

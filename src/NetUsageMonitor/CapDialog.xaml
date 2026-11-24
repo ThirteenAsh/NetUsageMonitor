@@ -1,29 +1,34 @@
 <Window x:Class="NetUsageMonitor.CapDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Set data limit" Width="400" SizeToContent="Height"
+        Language="zh-CN" Title="设置流量限额" Width="400" SizeToContent="Height"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="{StaticResource WindowBg}" Icon="Assets/app.ico">
+    <Window.Resources>
+        <DataTemplate x:Key="LimitOptionText">
+            <TextBlock Text="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        </DataTemplate>
+    </Window.Resources>
     <StackPanel Margin="18">
-        <TextBlock x:Name="HeaderText" Text="Block this app when it uses more than:" TextWrapping="Wrap" FontSize="13" />
+        <TextBlock x:Name="HeaderText" TextWrapping="Wrap" FontSize="13" />
         <StackPanel Orientation="Horizontal" Margin="0,12">
             <TextBox x:Name="AmountBox" Width="90" Text="500" HorizontalContentAlignment="Center" />
             <ComboBox x:Name="UnitBox" Width="70" Margin="8,0" SelectedIndex="0">
-                <ComboBoxItem>MB</ComboBoxItem>
-                <ComboBoxItem>GB</ComboBoxItem>
+                <ComboBoxItem ContentTemplate="{StaticResource LimitOptionText}">MB</ComboBoxItem>
+                <ComboBoxItem ContentTemplate="{StaticResource LimitOptionText}">GB</ComboBoxItem>
             </ComboBox>
-            <TextBlock Text="per" VerticalAlignment="Center" Margin="6,0" />
+            <TextBlock Text="周期" VerticalAlignment="Center" Margin="6,0" />
             <ComboBox x:Name="PeriodBox" Width="130" SelectedIndex="0">
-                <ComboBoxItem>Total (until reset)</ComboBoxItem>
-                <ComboBoxItem>Day</ComboBoxItem>
-                <ComboBoxItem>Month</ComboBoxItem>
+                <ComboBoxItem ContentTemplate="{StaticResource LimitOptionText}">累计（直到重置）</ComboBoxItem>
+                <ComboBoxItem ContentTemplate="{StaticResource LimitOptionText}">每天</ComboBoxItem>
+                <ComboBoxItem ContentTemplate="{StaticResource LimitOptionText}">每月</ComboBoxItem>
             </ComboBox>
         </StackPanel>
-        <TextBlock Text="When the limit is reached, the app's internet is blocked and you get a notification. You can reset or remove the limit anytime."
+        <TextBlock Text="达到限额后会禁止此应用联网，并发送通知。可随时重置计数或移除限额。"
                    Foreground="{StaticResource TextSecondary}" FontSize="11" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
-            <Button Content="Cancel" Click="OnCancel" Style="{StaticResource ToolButton}" Width="90" Margin="0,0,8,0" />
-            <Button Content="Set limit" Click="OnOk" Style="{StaticResource AccentButton}" Width="90" />
+            <Button Content="取消" Click="OnCancel" Style="{StaticResource ToolButton}" Width="90" Margin="0,0,8,0" />
+            <Button Content="保存限额" Click="OnOk" Style="{StaticResource AccentButton}" Width="90" />
         </StackPanel>
     </StackPanel>
 </Window>

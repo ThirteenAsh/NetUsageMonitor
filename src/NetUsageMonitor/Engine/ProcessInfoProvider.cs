@@ -34,11 +34,11 @@ public sealed class ProcessInfoProvider
     private static ProcessIdentity ResolveCore(int pid)
     {
         if (pid is 0 or 4)
-            return new ProcessIdentity(SystemKey, "System", null);
+            return new ProcessIdentity(SystemKey, "系统", null);
 
         var path = NativeMethods.TryGetProcessImagePath(pid);
         if (string.IsNullOrEmpty(path))
-            return new ProcessIdentity(UnknownKey, "Unknown / closed app", null);
+            return new ProcessIdentity(UnknownKey, "未知或已退出的应用", null);
 
         return new ProcessIdentity(path.ToLowerInvariant(), FriendlyName(path), path);
     }

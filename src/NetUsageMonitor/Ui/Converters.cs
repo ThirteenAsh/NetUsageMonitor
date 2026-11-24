@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using NetUsageMonitor.Common;
+using NetUsageMonitor.ViewModels;
 
 namespace NetUsageMonitor.Ui;
 
@@ -54,7 +55,7 @@ public sealed class NullToVisibilityConverter : IValueConverter
         => Binding.DoNothing;
 }
 
-/// <summary>Maps a row's status string to an accent brush for the status dot.</summary>
+/// <summary>Maps a row's status to an accent brush for the status dot.</summary>
 public sealed class StatusBrushConverter : IValueConverter
 {
     private static readonly SolidColorBrush Blocked = new(Color.FromRgb(0xEF, 0x44, 0x44));   // red
@@ -65,15 +66,15 @@ public sealed class StatusBrushConverter : IValueConverter
     private static readonly SolidColorBrush Idle = new(Color.FromRgb(0x37, 0x41, 0x51));     // dark
 
     public object Convert(object value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        var s = value as string ?? "";
-        if (s.Contains("Blocked", StringComparison.OrdinalIgnoreCase)) return Blocked;
-        if (s.Contains("Capped", StringComparison.OrdinalIgnoreCase)) return Capped;
-        if (s.Contains("Ignored", StringComparison.OrdinalIgnoreCase)) return Ignored;
-        if (s.Contains("Kept", StringComparison.OrdinalIgnoreCase)) return Kept;
-        if (s.Contains("Active", StringComparison.OrdinalIgnoreCase)) return Active;
-        return Idle;
-    }
+        => value switch
+        {
+            ProcessStatus.Blocked => Blocked,
+            ProcessStatus.Capped => Capped,
+            ProcessStatus.Ignored => Ignored,
+            ProcessStatus.Kept or ProcessStatus.KeptActive => Kept,
+            ProcessStatus.Active => Active,
+            _ => Idle
+        };
 
     public object ConvertBack(object value, Type targetType, object? parameter, CultureInfo culture)
         => Binding.DoNothing;

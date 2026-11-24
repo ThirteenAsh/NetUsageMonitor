@@ -34,7 +34,7 @@ public partial class SettingsWindow : Window
     {
         var dialog = new Microsoft.Win32.OpenFolderDialog
         {
-            Title = "Choose a folder to keep records in",
+            Title = "选择记录保存文件夹",
             InitialDirectory = System.IO.Directory.Exists(FolderBox.Text) ? FolderBox.Text : ""
         };
         if (dialog.ShowDialog(this) == true)
@@ -46,7 +46,7 @@ public partial class SettingsWindow : Window
 
     private void OnDeleteOld(object sender, RoutedEventArgs e)
     {
-        if (Confirm("Delete records older than the retention window?\n\"Kept\" apps are preserved."))
+        if (Confirm("要删除超出保留时长的记录吗？\n标记为“永久保留记录”的应用不受影响。"))
         {
             long cutoff = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - ParseRetention() * 60L;
             _tracker.Database.PruneExceptKept(cutoff, _settings.GetKeptKeysSnapshot());
@@ -55,7 +55,7 @@ public partial class SettingsWindow : Window
 
     private void OnDeleteAll(object sender, RoutedEventArgs e)
     {
-        if (Confirm("Delete ALL stored records? This cannot be undone."))
+        if (Confirm("要删除全部已保存的记录吗？此操作无法撤销。"))
             _tracker.Database.DeleteAllSamples();
     }
 
@@ -83,6 +83,6 @@ public partial class SettingsWindow : Window
     }
 
     private static bool Confirm(string message)
-        => MessageBox.Show(message, "NetUsage Monitor", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+        => MessageBox.Show(message, App.DisplayName, MessageBoxButton.YesNo, MessageBoxImage.Warning)
            == MessageBoxResult.Yes;
 }

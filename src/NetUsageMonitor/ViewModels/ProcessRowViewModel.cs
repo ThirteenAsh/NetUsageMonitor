@@ -5,6 +5,18 @@ using NetUsageMonitor.Ui;
 
 namespace NetUsageMonitor.ViewModels;
 
+public enum ProcessStatus
+{
+    Idle,
+    Active,
+    Kept,
+    KeptActive,
+    Ignored,
+    NotTracked,
+    Blocked,
+    Capped
+}
+
 /// <summary>One row in the apps grid; updated in place each tick so sorting/selection stay stable.</summary>
 public sealed class ProcessRowViewModel : ObservableObject
 {
@@ -72,18 +84,35 @@ public sealed class ProcessRowViewModel : ObservableObject
     private bool _capTripped;
     public bool CapTripped { get => _capTripped; set => SetProperty(ref _capTripped, value); }
 
-    private string _statusText = "Idle";
-    public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
+    private ProcessStatus _status;
+    public ProcessStatus Status
+    {
+        get => _status;
+        private set { if (SetProperty(ref _status, value)) OnPropertyChanged(nameof(StatusText)); }
+    }
+
+    public string StatusText => Status switch
+    {
+        ProcessStatus.Active => "活跃",
+        ProcessStatus.Kept => "永久保留",
+        ProcessStatus.KeptActive => "永久保留 · 活跃",
+        ProcessStatus.Ignored => "已忽略",
+        ProcessStatus.NotTracked => "未跟踪",
+        ProcessStatus.Blocked => "已禁止联网",
+        ProcessStatus.Capped => "已达限额",
+        _ => "空闲"
+    };
 
     // ---- Derived (for the detail panel) ----
+    private int _retentionMinutes = 60;
     public double CapPercent => HasCap && CapLimit > 0 ? Math.Min(100.0, CapUsed * 100.0 / CapLimit) : 0;
-    public string CapText => HasCap ? $"{ByteFormatter.Bytes(CapUsed)} / {ByteFormatter.Bytes(CapLimit)}" : "No limit set";
-    public string AvgPerMinDownText => ByteFormatter.Bytes((long)(DownHour / 60.0)) + "/min";
-    public string AvgPerMinUpText => ByteFormatter.Bytes((long)(UpHour / 60.0)) + "/min";
-    public string BlockText => IsBlocked ? "Unblock internet" : "Block internet";
-    public string RecordConnText => IsRecordingConnections ? "Stop recording connections" : "Record connections";
+    public string CapText => HasCap ? $"{ByteFormatter.Bytes(CapUsed)} / {ByteFormatter.Bytes(CapLimit)}" : "未设置限额";
+    public string AvgPerMinDownText => ByteFormatter.Bytes(DownHour / _retentionMinutes) + "/分钟";
+    public string AvgPerMinUpText => ByteFormatter.Bytes(UpHour / _retentionMinutes) + "/分钟";
+    public string BlockText => IsBlocked ? "恢复联网" : "禁止联网";
+    public string RecordConnText => IsRecordingConnections ? "停止记录连接" : "记录连接";
 
-    public void Update(GroupUsage g, IconProvider icons)
+    public void Update(GroupUsage g, IconProvider icons, int retentionMinutes)
     {
         DisplayName = g.DisplayName;
         if (ExePath != g.ExePath)
@@ -107,7 +136,8 @@ public sealed class ProcessRowViewModel : ObservableObject
         CapLimit = g.CapLimitBytes;
         CapUsed = g.CapUsedBytes;
         CapTripped = g.CapTripped;
-        StatusText = ComputeStatus(g);
+        _retentionMinutes = Math.Max(1, retentionMinutes);
+        Status = ComputeStatus(g);
 
         // Refresh derived values shown in the detail panel.
         OnPropertyChanged(nameof(CapPercent));
@@ -118,14 +148,14 @@ public sealed class ProcessRowViewModel : ObservableObject
         OnPropertyChanged(nameof(RecordConnText));
     }
 
-    private static string ComputeStatus(GroupUsage g)
+    private static ProcessStatus ComputeStatus(GroupUsage g)
     {
-        if (g.IsBlocked) return "Blocked";
-        if (g.IsIgnored) return "Ignored";
-        if (!g.IsRecorded) return "Not tracked";
+        if (g.IsBlocked) return ProcessStatus.Blocked;
+        if (g.IsIgnored) return ProcessStatus.Ignored;
+        if (!g.IsRecorded) return ProcessStatus.NotTracked;
         bool active = g.RecvRate >= 1 || g.SentRate >= 1;
-        if (g.HasCap && g.CapTripped) return "Capped";
-        if (g.IsKept) return active ? "Kept · Active" : "Kept";
-        return active ? "Active" : "Idle";
+        if (g.HasCap && g.CapTripped) return ProcessStatus.Capped;
+        if (g.IsKept) return active ? ProcessStatus.KeptActive : ProcessStatus.Kept;
+        return active ? ProcessStatus.Active : ProcessStatus.Idle;
     }
 }

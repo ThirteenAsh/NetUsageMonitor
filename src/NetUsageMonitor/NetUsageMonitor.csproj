@@ -14,10 +14,11 @@
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
 
     <!-- Product metadata -->
-    <Product>NetUsage Monitor</Product>
+    <Product>网络流量监控</Product>
+    <AssemblyTitle>网络流量监控</AssemblyTitle>
     <Company>NetUsage Monitor</Company>
     <Authors>NetUsage Monitor contributors</Authors>
-    <Description>Live and historical per-application network usage monitor for Windows.</Description>
+    <Description>查看 Windows 各应用的实时网络流量与历史记录。</Description>
     <Version>1.1.0</Version>
     <FileVersion>1.1.0.0</FileVersion>
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
